@@ -22,21 +22,17 @@ public class Hooks {
     }
 
     @Before //Runs before each and every scenario
-    public void setUp(){
+    public void setUp(){ //Test CI
         String browser = System.getProperty("browser");
         System.out.println("Browser from commandline: " + browser);
         if(browser==null){browser="";}
-        switch (browser){
-            case "firefox":
-                driver = new FirefoxDriver();
-                break;
-            case "chrome":
-                driver = new ChromeDriver();
-                break;
-            default:
+        switch (browser) {
+            case "firefox" -> driver = new FirefoxDriver();
+            case "chrome" -> driver = new ChromeDriver();
+            default -> {
                 System.out.println("Invalid browser selection. Using Edge");
                 driver = new EdgeDriver();
-                break;
+            }
         }
 
 
