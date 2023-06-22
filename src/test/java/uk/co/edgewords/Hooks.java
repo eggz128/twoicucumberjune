@@ -2,10 +2,15 @@ package uk.co.edgewords;
 
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
+import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+
+import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.requestSpecification;
 
 public class Hooks {
     private WebDriver driver; //Field to hold WebDriver instance - shareable between methods in this class
@@ -21,7 +26,7 @@ public class Hooks {
         this.dict = dict; //take the Pico-container supplied dictionary and put it in this class's private field
     }
 
-    @Before //Runs before each and every scenario
+    @Before("@GUI") //Runs before each and every scenario
     public void setUp(){ //Test CI
         String browser = System.getProperty("browser");
         System.out.println("Browser from commandline: " + browser);
@@ -40,9 +45,19 @@ public class Hooks {
         //dict.addDict("mydriver", "Steve"); //DANGER: A string is not a WebDriver - so casting back later will fail at runtime - no compiler warnings
     }
 
-    @After //Runs after each and every scenario - even if steps in the scenario fail
+    @After("@GUI") //Runs after each and every scenario - even if steps in the scenario fail
     public void tearDown() throws InterruptedException {
         Thread.sleep(2000); //Just so we can observe the results, keep the browser open for 2 secs
         driver.quit(); //before cleanup (quit)
+    }
+
+    @Before("@API")
+    public void setUpAPI(){
+        RequestSpecification spec = given();
+        spec.baseUri("http://localhost");
+        spec.port(2002);
+        spec.contentType(ContentType.JSON);
+
+        requestSpecification = spec;
     }
 }
